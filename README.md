@@ -1,7 +1,5 @@
 # IMWSPlagFinder
 
-[![Build Status](https://github.com/raphaelsuda/IMWSPlagFinder.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/raphaelsuda/IMWSPlagFinder.jl/actions/workflows/CI.yml?query=branch%3Amain)
-
 A Julia package for finding possibly plagiarised files.
 The main function compares text files, calculates their Levenshtein distance, and generates an report containing comparisons, which exceed a certain threshold.
 
@@ -36,3 +34,8 @@ Both methods also take the following additional keyword arguments (values after 
 - `report_name = "report"`: Name of the report.
 - `name_depth = 3`: Level of the name folder relative to the given `path`. If the file path is `"submissions/WS23/HUE1/name/func.m"` and the input for `path` is `"submissions"`, `name_depth` would be `3`.
 
+## Original intentions
+This script was originally developed for analyzing the submissions in the lecture "VU Finite Elemente Methoden".
+Within this lecture, students have to submit MATLAB functions and scripts in four subsequent exercises.
+The default values were chosen for this purpose.
+Nevertheless, the package can be also applied to problem with different files and folder structure.
