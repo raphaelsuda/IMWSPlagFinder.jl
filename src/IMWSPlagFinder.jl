@@ -25,6 +25,22 @@ function contains_all_from_array(haystack::AbstractString, needles::Array)
     return true
 end
 
+function get_sorted_list_from_dict(d::Dict)
+    key_list = Array{typeof(collect(keys(d))[1]),1}()
+    value_list = Array{typeof(collect(values(d))[1]),1}()
+    for k in keys(d)
+        i = findfirst(x -> x < d[k], value_list)
+        if isnothing(i)
+            push!(value_list, d[k])
+            push!(key_list, k)
+        else
+            insert!(value_list, i, d[k])
+            insert!(key_list, i, k)
+        end
+    end
+    return key_list, value_list
+end
+
 # Berechnet die Levenshtein-Distanz von zwei Strings
 function levenshtein(s1::String,s2::String)
     compare(s1,s2,Levenshtein())
@@ -120,9 +136,12 @@ function compare_files(path, compare_A, compare_B, threshold; excluded=[], file_
                         "Zusätzlich wurden foglende Zeichen beim Vergleich ignoriert: $(dc).",
                         "",
                         "Der Grenzwert der Levenshtein-Distanz wurde mit $(threshold) gewählt.",
+                        "Die folgende Liste ist absteigend nach der Levenshtein-Distanz sortiert.",
+                        "Eine größere Levenshtein-Distanz bedeutet eine größere Ähnlichkeit der Dateien.",
                         ""]
-    for t in keys(plags)
-        push!(out_array,"[] $(t[1]) -- $(t[2]) --> $(round(diffs[t];digits=4))")
+    sorted_keys_plags, sorted_values_plags = get_sorted_list_from_dict(plags)
+    for i in 1:length(sorted_keys_plags)
+        push!(out_array,"[] $(sorted_keys_plags[i][1]) -- $(sorted_keys_plags[i][2]) --> $(round(sorted_values_plags[i];digits=4))")
     end
     writedlm("$(report_name).txt", out_array)
     summarize(diffs, plags, threshold, report_name)
