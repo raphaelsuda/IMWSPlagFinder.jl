@@ -115,8 +115,15 @@ function summarize(diffs, plags, threshold, report_name)
         println("-------------------------------------------------------")
     end
 end
-function compare_files(path, compare_from, compare_to, threshold; excluded=[], file_endings=[".m"], dc=[' ', '%'], report_path = "./", report_name="report", name_depth=3)
-    database = generate_database(path; file_endings=file_endings, dc=dc)
+
+"""
+    compare_files(path, compare_from, compare_to, threshold; excluded=[], file_endings=[".m"], chars_to_delete=[' ', '%'], report_path = "./", report_name="report", name_depth=3)
+
+Searches for files with one of the file endings in `file_ending` within `path`, reads them, deletes newline characters and each character in `chars_to_delete`, and writes them to a dictionary.
+Each file, which contains each string in `compare_from` in their file path, is then compared to each file, which contains each string in `compare_to` in their file path, by calculating the Levenshtein distance. If the Levenshtein distance is greater than `threshold`, the files are considered to be plagiarized. The results are written to a file with ending `.txt` in `report_path` with the name `report_name`.
+"""
+function compare_files(path, compare_from, compare_to, threshold; excluded=[], file_endings=[".m"], chars_to_delete=[' ', '%'], report_path = "./", report_name="report", name_depth=3)
+    database = generate_database(path; file_endings=file_endings, dc=chars_to_delete)
     diffs = Dict{Tuple, Number}()
     plags = Dict{Tuple, Number}()
     @showprogress 0.1 "Comparing..." for k in keys(database)
@@ -143,7 +150,7 @@ function compare_files(path, compare_from, compare_to, threshold; excluded=[], f
                         "Dabei wurden alle Dateien ignoriert, deren Pfad folgende Teile enthält: $(replace("$(excluded)", '"' => "'")).",
                         "",
                         "Es wurden nur Dateien berücksichtigt die folgende Dateiendungen haben: $(replace("$(file_endings)", '"' => "'")).",
-                        "Zusätzlich wurden foglende Zeichen beim Vergleich ignoriert: $(dc).",
+                        "Zusätzlich wurden foglende Zeichen beim Vergleich ignoriert: $(chars_to_delete).",
                         "",
                         "Der Grenzwert der Levenshtein-Distanz wurde mit $(threshold) gewählt.",
                         "Die folgende Liste ist absteigend nach der Levenshtein-Distanz sortiert.",
