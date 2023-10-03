@@ -124,7 +124,7 @@ function compare_files(path, compare_A, compare_B, threshold; excluded=[], file_
     for t in keys(plags)
         push!(out_array,"[] $(t[1]) -- $(t[2]) --> $(round(diffs[t];digits=4))")
     end
-    writedlm("plags_$(report_name).txt", out_array)
+    writedlm("$(report_name).txt", out_array)
     summarize(diffs, plags, threshold, report_name)
 end
 end
