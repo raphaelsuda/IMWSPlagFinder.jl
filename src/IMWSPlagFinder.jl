@@ -63,7 +63,7 @@ function generate_database(path; file_endings=[".m"], dc=[' ', '%'])
     return file_dict
 end
 
-function summarize(diffs, plags, threshold)
+function summarize(diffs, plags, threshold, report_name)
     # Alle Levenshtein-Distanzen in einem Array sammeln und median bzw 99%-Quantile berechnen
     a = Float64[]
     for n in keys(diffs)
@@ -78,7 +78,7 @@ function summarize(diffs, plags, threshold)
         println("I found $(n_plags) cases of possible plagiarism!")
         println(" median = $(round(median_diff;digits=3)), q_99 = $(round(quantile_99_diff;digits=3))")
         println("The Levenshtein-threshold was set to $(threshold).")
-        println("Take a closer look at the submissions, listed in the files plags_filename.txt!")
+        println("Take a closer look at the submissions, listed in the file $(report_name).txt!")
         println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     else
         println("-------------------------------------------------------")
@@ -89,7 +89,7 @@ function summarize(diffs, plags, threshold)
         println("-------------------------------------------------------")
     end
 end
-function compare_files(path, compare_A, compare_B, threshold; excluded=[], file_endings=[".m"], dc=[' ', '%'], report_name="report")
+function compare_files(path, compare_A, compare_B, threshold; excluded=[], file_endings=[".m"], dc=[' ', '%'], report_path = "./", report_name="report")
     database = generate_database(path; file_endings=file_endings, dc=dc)
     diffs = Dict{Tuple, Number}()
     plags = Dict{Tuple, Number}()
@@ -125,6 +125,6 @@ function compare_files(path, compare_A, compare_B, threshold; excluded=[], file_
         push!(out_array,"[] $(t[1]) -- $(t[2]) --> $(round(diffs[t];digits=4))")
     end
     writedlm("plags_$(report_name).txt", out_array)
-    summarize(diffs, plags, threshold)
+    summarize(diffs, plags, threshold, report_name)
 end
 end
