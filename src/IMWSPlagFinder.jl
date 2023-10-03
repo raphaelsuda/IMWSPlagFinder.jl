@@ -110,7 +110,17 @@ function compare_files(path, compare_A, compare_B, threshold; excluded=[], file_
         end
     end
     # Alle vermutlichen Plagiate mit der Levenshtein-Distanz in Datei schreiben
-    out_array = String["# Plagiats-Bericht", "$(today())", "", "Alle Dateien, deren Pfad '$(compare_A)' enthält, wurden mit allen anderen Dateien verglichen, deren Pfad '$(compare_B)' enthält.", "Dabei wurden alle Dateien ignoriert, deren Pfad folgende Teile enthält: $(replace("$(excluded)", '"' => "'")).", "", "Es wurden nur Dateien berücksichtigt die folgende Dateiendungen haben: $(replace("$(file_endings)", '"' => "'")).", "Zusätzlich wurden foglende Zeichen beim Vergleich ignoriert: $(dc).", "", "Der Grenzwert der Levenshtein-Distanz wurde mit $(threshold) gewählt.", ""]
+    out_array = String["# Plagiats-Bericht",
+                        "$(today())",
+                        "",
+                        "Alle Dateien, deren Pfad '$(compare_A)' enthält, wurden mit allen anderen Dateien verglichen, deren Pfad '$(compare_B)' enthält.",
+                        "Dabei wurden alle Dateien ignoriert, deren Pfad folgende Teile enthält: $(replace("$(excluded)", '"' => "'")).",
+                        "",
+                        "Es wurden nur Dateien berücksichtigt die folgende Dateiendungen haben: $(replace("$(file_endings)", '"' => "'")).",
+                        "Zusätzlich wurden foglende Zeichen beim Vergleich ignoriert: $(dc).",
+                        "",
+                        "Der Grenzwert der Levenshtein-Distanz wurde mit $(threshold) gewählt.",
+                        ""]
     for t in keys(plags)
         push!(out_array,"[] $(t[1]) -- $(t[2]) --> $(round(diffs[t];digits=4))")
     end
