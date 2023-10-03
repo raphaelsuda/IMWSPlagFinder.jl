@@ -115,17 +115,17 @@ function summarize(diffs, plags, threshold, report_name)
         println("-------------------------------------------------------")
     end
 end
-function compare_files(path, compare_A, compare_B, threshold; excluded=[], file_endings=[".m"], dc=[' ', '%'], report_path = "./", report_name="report", name_depth=3)
+function compare_files(path, compare_from, compare_to, threshold; excluded=[], file_endings=[".m"], dc=[' ', '%'], report_path = "./", report_name="report", name_depth=3)
     database = generate_database(path; file_endings=file_endings, dc=dc)
     diffs = Dict{Tuple, Number}()
     plags = Dict{Tuple, Number}()
     @showprogress 0.1 "Comparing..." for k in keys(database)
-        if contains_all_from_array(k, compare_A)
+        if contains_all_from_array(k, compare_from)
             for k2 in keys(database)
                 if contains_one_from_array(k2, excluded)
                     continue
                 end
-                if k != k2 && contains_all_from_array(k2, compare_B)
+                if k != k2 && contains_all_from_array(k2, compare_to)
                     l = levenshtein(database[k], database[k2])
                     diffs[(k, k2)] = l
                     if l >= threshold
@@ -139,7 +139,7 @@ function compare_files(path, compare_A, compare_B, threshold; excluded=[], file_
     out_array = String["# Plagiats-Bericht",
                         "$(today())",
                         "",
-                        "Alle Dateien, deren Pfad '$(compare_A)' enthält, wurden mit allen anderen Dateien verglichen, deren Pfad '$(compare_B)' enthält.",
+                        "Alle Dateien, deren Pfad '$(compare_from)' enthält, wurden mit allen anderen Dateien verglichen, deren Pfad '$(compare_to)' enthält.",
                         "Dabei wurden alle Dateien ignoriert, deren Pfad folgende Teile enthält: $(replace("$(excluded)", '"' => "'")).",
                         "",
                         "Es wurden nur Dateien berücksichtigt die folgende Dateiendungen haben: $(replace("$(file_endings)", '"' => "'")).",
