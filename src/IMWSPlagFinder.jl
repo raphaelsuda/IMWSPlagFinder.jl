@@ -143,7 +143,7 @@ function compare_files(path, compare_A, compare_B, threshold; excluded=[], file_
     for i in 1:length(sorted_keys_plags)
         push!(out_array,"[] $(sorted_keys_plags[i][1]) -- $(sorted_keys_plags[i][2]) --> $(round(sorted_values_plags[i];digits=4))")
     end
-    writedlm("$(report_name).txt", out_array)
+    writedlm(joinpath(report_path,"$(report_name).txt"), out_array)
     summarize(diffs, plags, threshold, report_name)
 end
 end
