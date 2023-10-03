@@ -89,7 +89,7 @@ function summarize(diffs, plags, threshold)
         println("-------------------------------------------------------")
     end
 end
-function compare_files(path, compare_A, compare_B, threshold; excluded=[], file_endings=[".m"], dc=[' ', '%'], report_path="")
+function compare_files(path, compare_A, compare_B, threshold; excluded=[], file_endings=[".m"], dc=[' ', '%'], report_name="report")
     database = generate_database(path; file_endings=file_endings, dc=dc)
     diffs = Dict{Tuple, Number}()
     plags = Dict{Tuple, Number}()
@@ -124,7 +124,7 @@ function compare_files(path, compare_A, compare_B, threshold; excluded=[], file_
     for t in keys(plags)
         push!(out_array,"[] $(t[1]) -- $(t[2]) --> $(round(diffs[t];digits=4))")
     end
-    writedlm("plags_$(replace(compare_A, '/' => '_'))_vs_$(replace(compare_B, '/' => '_')).txt", out_array)
+    writedlm("plags_$(report_name).txt", out_array)
     summarize(diffs, plags, threshold)
 end
 end
