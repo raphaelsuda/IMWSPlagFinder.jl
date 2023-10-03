@@ -163,4 +163,51 @@ function compare_files(path, compare_from, compare_to, threshold; excluded=[], f
     writedlm(joinpath(report_path,"$(report_name).txt"), out_array)
     summarize(diffs, plags, threshold, report_name)
 end
+"""
+    compare_files(path, threshold; excluded=[], file_endings=[".m"], chars_to_delete=[' ', '%'], report_path = "./", report_name="report", name_depth=3)
+
+Searches for files with one of the file endings in `file_ending` within `path`, reads them, deletes newline characters and each character in `chars_to_delete`, and writes them to a dictionary.
+Each file is then compared to each other file by calculating the Levenshtein distance.
+If the Levenshtein distance is greater than `threshold`, the files are considered to be plagiarized.
+The results are written to a file with ending `.txt` in `report_path` with the name `report_name`.
+"""
+function compare_files(path, threshold; excluded=[], file_endings=[".m"], chars_to_delete=[' ', '%'], report_path = "./", report_name="report")
+    database = generate_database(path; file_endings=file_endings, dc=chars_to_delete)
+    diffs = Dict{Tuple, Number}()
+    plags = Dict{Tuple, Number}()
+    @showprogress 0.1 "Comparing..." for k in keys(database)
+        for k2 in keys(database)
+            if contains_one_from_array(k2, excluded)
+                continue
+            end
+            if k != k2
+                l = levenshtein(database[k], database[k2])
+                diffs[(k, k2)] = l
+                if l >= threshold
+                    plags[(k, k2)] = l
+                end
+            end
+        end
+    end
+    # Alle vermutlichen Plagiate mit der Levenshtein-Distanz in Datei schreiben
+    out_array = String["# Plagiats-Bericht",
+                        "$(today())",
+                        "",
+                        "Alle Dateien, in $(path) wurden miteinander verglichen.",
+                        "Dabei wurden alle Dateien ignoriert, deren Pfad folgende Teile enthält: $(replace("$(excluded)", '"' => "'")).",
+                        "",
+                        "Es wurden nur Dateien berücksichtigt die folgende Dateiendungen haben: $(replace("$(file_endings)", '"' => "'")).",
+                        "Zusätzlich wurden foglende Zeichen beim Vergleich ignoriert: $(chars_to_delete).",
+                        "",
+                        "Der Grenzwert der Levenshtein-Distanz wurde mit $(threshold) gewählt.",
+                        "Die folgende Liste ist absteigend nach der Levenshtein-Distanz sortiert.",
+                        "Eine größere Levenshtein-Distanz bedeutet eine größere Ähnlichkeit der Dateien.",
+                        ""]
+    sorted_keys_plags, sorted_values_plags = get_sorted_list_from_dict(plags)
+    for i in 1:length(sorted_keys_plags)
+        push!(out_array,"[] $(get_summary(sorted_keys_plags[i][1], path, name_depth)) -- $(get_summary(sorted_keys_plags[i][2], path, name_depth)) --> $(round(sorted_values_plags[i];digits=4))")
+    end
+    writedlm(joinpath(report_path,"$(report_name).txt"), out_array)
+    summarize(diffs, plags, threshold, report_name)
+end
 end
