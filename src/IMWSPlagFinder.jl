@@ -79,6 +79,16 @@ function generate_database(path; file_endings=[".m"], dc=[' ', '%'])
     return file_dict
 end
 
+get_name(path, submissions_path, name_depth) = splitpath(path)[name_depth+length(splitpath(submissions_path))]
+
+get_file_name(path) = splitpath(path)[end]
+
+get_sub_path(path, submissions_path, name_depth) = joinpath(splitpath(path)[length(splitpath(submissions_path))+1:name_depth+length(splitpath(submissions_path))-1])
+
+function get_summary(path, submissions_path, name_depth)
+    return "$(get_name(path, submissions_path, name_depth)): $(get_file_name(path)) ($(get_sub_path(path, submissions_path, name_depth)))"
+end
+
 function summarize(diffs, plags, threshold, report_name)
     # Alle Levenshtein-Distanzen in einem Array sammeln und median bzw 99%-Quantile berechnen
     a = Float64[]
@@ -105,7 +115,7 @@ function summarize(diffs, plags, threshold, report_name)
         println("-------------------------------------------------------")
     end
 end
-function compare_files(path, compare_A, compare_B, threshold; excluded=[], file_endings=[".m"], dc=[' ', '%'], report_path = "./", report_name="report")
+function compare_files(path, compare_A, compare_B, threshold; excluded=[], file_endings=[".m"], dc=[' ', '%'], report_path = "./", report_name="report", name_depth=3)
     database = generate_database(path; file_endings=file_endings, dc=dc)
     diffs = Dict{Tuple, Number}()
     plags = Dict{Tuple, Number}()
@@ -141,7 +151,7 @@ function compare_files(path, compare_A, compare_B, threshold; excluded=[], file_
                         ""]
     sorted_keys_plags, sorted_values_plags = get_sorted_list_from_dict(plags)
     for i in 1:length(sorted_keys_plags)
-        push!(out_array,"[] $(sorted_keys_plags[i][1]) -- $(sorted_keys_plags[i][2]) --> $(round(sorted_values_plags[i];digits=4))")
+        push!(out_array,"[] $(get_summary(sorted_keys_plags[i][1], path, name_depth)) -- $(get_summary(sorted_keys_plags[i][2], path, name_depth)) --> $(round(sorted_values_plags[i];digits=4))")
     end
     writedlm(joinpath(report_path,"$(report_name).txt"), out_array)
     summarize(diffs, plags, threshold, report_name)
