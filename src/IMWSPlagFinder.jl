@@ -7,13 +7,22 @@ using Statistics
 
 export compare_files
 
-function contains_from_array(haystack::AbstractString, needles::Array)
+function contains_one_from_array(haystack::AbstractString, needles::Array)
     for needle in needles
         if contains(haystack, needle)
             return true
         end
     end
     return false
+end
+
+function contains_all_from_array(haystack::AbstractString, needles::Array)
+    for needle in needles
+        if !contains(haystack, needle)
+            return false
+        end
+    end
+    return true
 end
 
 # Berechnet die Levenshtein-Distanz von zwei Strings
@@ -85,12 +94,12 @@ function compare_files(path, compare_A, compare_B, threshold; excluded=[], file_
     diffs = Dict{Tuple, Number}()
     plags = Dict{Tuple, Number}()
     @showprogress 0.1 "Comparing..." for k in keys(database)
-        if contains(k, compare_A)
+        if contains_all_from_array(k, compare_A)
             for k2 in keys(database)
-                if contains_from_array(k2, excluded)
+                if contains_one_from_array(k2, excluded)
                     continue
                 end
-                if k != k2 && contains(k2, compare_B)
+                if k != k2 && contains_all_from_array(k2, compare_B)
                     l = levenshtein(database[k], database[k2])
                     diffs[(k, k2)] = l
                     if l >= threshold
