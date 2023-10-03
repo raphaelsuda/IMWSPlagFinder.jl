@@ -73,8 +73,10 @@ function summarize(diffs, plags, threshold)
         println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     else
         println("-------------------------------------------------------")
-        println("I couldn't fint any cases of plagiarism.")
-        println("Maybe you should change the threshold?")
+        println("I couldn't find any cases of plagiarism.")
+        println("I guess that's a good sign,")
+        println("but maybe you should change the threshold,")
+        println("just to be sure.")
         println("-------------------------------------------------------")
     end
 end
