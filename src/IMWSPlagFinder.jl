@@ -5,7 +5,7 @@ using ProgressMeter
 using StringDistances
 using Statistics
 
-export compare_files
+export compare_files, search_for_file
 
 function contains_one_from_array(haystack::AbstractString, needles::Array)
     for needle in needles
