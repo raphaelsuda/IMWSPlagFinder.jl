@@ -90,7 +90,7 @@ end
 Creates a list of all subdirectories in `path` and searches for `file_name` in each of them.
 Returns a list of all subdirectories, which do not contain `file_name`.
 """
-function search_for_file(path, file_name, report_path = "./", report_name="missing_file_report")
+function search_for_file(path, file_name; report_path = "./", report_name="missing_file_report")
     names = readdir(path)[isdir.(joinpath.(path,readdir(path)))]
     database = generate_database(path)
     file_found = AbstractString[]
