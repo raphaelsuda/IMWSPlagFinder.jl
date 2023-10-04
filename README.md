@@ -56,6 +56,13 @@ Additionally, the following two keyword arguments define the path and name of th
 - `report_path = "./"`: Defines the path of the report.
 - `report_name = "missing_files_report`: Defines the name of the report.
 
+Examples would be the following searches:
+
+```julia
+search_for_file("FE_Abgaben/WS22/HUE1", "/shapefunc_CST.m") # / is included, since else it would also find "dshapefunc_CST.m"
+search_for_file("FE_Abgaben/WS22/HUE1", "script_HUE1_1") # Parts of the file name can also be searched."
+```
+
 ## Original intentions
 This script was originally developed for analyzing the submissions in the lecture "VU Finite Elemente Methoden".
 Within this lecture, students have to submit MATLAB functions and scripts in four subsequent exercises.
