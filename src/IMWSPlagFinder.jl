@@ -160,21 +160,22 @@ function compare_files(path, compare_from, compare_to, threshold; excluded=[], f
                         "Dabei wurden alle Dateien ignoriert, deren Pfad folgende Teile enthält: $(replace("$(excluded)", '"' => "'")).",
                         "",
                         "Es wurden nur Dateien berücksichtigt die folgende Dateiendungen haben: $(replace("$(file_endings)", '"' => "'")).",
-                        "Zusätzlich wurden folgende Zeichen beim Vergleich ignoriert: $(chars_to_delete).",
-                        ""]
+                        "Zusätzlich wurden folgende Zeichen beim Vergleich ignoriert: $(chars_to_delete)."]
     if length(no_comments) > 0
-        append!(out_array, ["## Kommentar-Check",
-                        "Folgende Abgaben enthalten weniger als $(min_comments) Kommentare:",
-                        ""])
+        append!(out_array, ["",
+                            "## Kommentar-Check",
+                            "Folgende Abgaben enthalten weniger als $(min_comments) Kommentare:",
+                            ""])
         for k in keys(no_comments)
             push!(out_array,"[] $(get_name(k, path, name_depth)): $(get_file_name(k)) --> $(no_comments[k]) Kommentare")
         end
     end
-    append!(out_array, ["## Plagiate",
-                      "Der Grenzwert der Levenshtein-Distanz wurde mit $(threshold) gewählt.",
-                      "Die folgende Liste ist absteigend nach der Levenshtein-Distanz sortiert.",
-                      "Eine größere Levenshtein-Distanz bedeutet eine größere Ähnlichkeit der Dateien.",
-                      ""])
+    append!(out_array, ["",
+                        "## Plagiate",
+                        "Der Grenzwert der Levenshtein-Distanz wurde mit $(threshold) gewählt.",
+                        "Die folgende Liste ist absteigend nach der Levenshtein-Distanz sortiert.",
+                        "Eine größere Levenshtein-Distanz bedeutet eine größere Ähnlichkeit der Dateien.",
+                        ""])
     sorted_keys_plags, sorted_values_plags = get_sorted_list_from_dict(plags)
     for i in 1:length(sorted_keys_plags)
         if sorted_keys_plags[i] ∉ keys(no_comments)
@@ -223,21 +224,22 @@ function compare_files(path, threshold; excluded=[], file_endings=[".m"], chars_
                         "Dabei wurden alle Dateien ignoriert, deren Pfad folgende Teile enthält: $(replace("$(excluded)", '"' => "'")).",
                         "",
                         "Es wurden nur Dateien berücksichtigt die folgende Dateiendungen haben: $(replace("$(file_endings)", '"' => "'")).",
-                        "Zusätzlich wurden folgende Zeichen beim Vergleich ignoriert: $(chars_to_delete).",
-                        ""]
+                        "Zusätzlich wurden folgende Zeichen beim Vergleich ignoriert: $(chars_to_delete)."]
     if length(no_comments) > 0
-        append!(out_array, ["## Kommentar-Check",
-                        "Folgende Abgaben enthalten weniger als $(min_comments) Kommentare:",
-                        ""])
+        append!(out_array, ["",
+                            "## Kommentar-Check",
+                            "Folgende Abgaben enthalten weniger als $(min_comments) Kommentare:",
+                            ""])
         for k in keys(no_comments)
             push!(out_array,"[] $(get_name(k, path, name_depth)): $(get_file_name(k)) --> $(no_comments[k]) Kommentare")
         end
     end
-    append!(out_array, ["## Plagiate",
-                      "Der Grenzwert der Levenshtein-Distanz wurde mit $(threshold) gewählt.",
-                      "Die folgende Liste ist absteigend nach der Levenshtein-Distanz sortiert.",
-                      "Eine größere Levenshtein-Distanz bedeutet eine größere Ähnlichkeit der Dateien.",
-                      ""])
+    append!(out_array, ["",
+                        "## Plagiate",
+                        "Der Grenzwert der Levenshtein-Distanz wurde mit $(threshold) gewählt.",
+                        "Die folgende Liste ist absteigend nach der Levenshtein-Distanz sortiert.",
+                        "Eine größere Levenshtein-Distanz bedeutet eine größere Ähnlichkeit der Dateien.",
+                        ""])
     sorted_keys_plags, sorted_values_plags = get_sorted_list_from_dict(plags)
     for i in 1:length(sorted_keys_plags)
         if sorted_keys_plags[i] ∉ keys(no_comments)
