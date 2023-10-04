@@ -226,13 +226,15 @@ function compare_files(path, compare_from, compare_to, threshold; excluded=[], f
                         "Die folgende Liste ist absteigend nach der Levenshtein-Distanz sortiert.",
                         "Eine größere Levenshtein-Distanz bedeutet eine größere Ähnlichkeit der Dateien.",
                         ""])
-    sorted_keys_plags, sorted_values_plags = get_sorted_list_from_dict(plags)
-    for i in 1:length(sorted_keys_plags)
-        if sorted_keys_plags[i] ∉ keys(no_comments)
-            push!(out_array,"[] $(get_summary(sorted_keys_plags[i][1], path, name_depth)) -- $(get_summary(sorted_keys_plags[i][2], path, name_depth)) --> $(round(sorted_values_plags[i];digits=4))")
+    if length(plags) > 0
+        sorted_keys_plags, sorted_values_plags = get_sorted_list_from_dict(plags)
+        for i in 1:length(sorted_keys_plags)
+            if sorted_keys_plags[i] ∉ keys(no_comments)
+                push!(out_array,"[] $(get_summary(sorted_keys_plags[i][1], path, name_depth)) -- $(get_summary(sorted_keys_plags[i][2], path, name_depth)) --> $(round(sorted_values_plags[i];digits=4))")
+            end
         end
     end
-    if length(no_comments) > 0 && length(plags) > 0
+    if length(no_comments) > 0 || length(plags) > 0
         writedlm(joinpath(report_path,"$(report_name).txt"), out_array)
     end
     summarize(diffs, plags, threshold, report_name)
@@ -293,13 +295,15 @@ function compare_files(path, threshold; excluded=[], file_endings=[".m"], chars_
                         "Die folgende Liste ist absteigend nach der Levenshtein-Distanz sortiert.",
                         "Eine größere Levenshtein-Distanz bedeutet eine größere Ähnlichkeit der Dateien.",
                         ""])
-    sorted_keys_plags, sorted_values_plags = get_sorted_list_from_dict(plags)
-    for i in 1:length(sorted_keys_plags)
-        if sorted_keys_plags[i] ∉ keys(no_comments)
-            push!(out_array,"[] $(get_summary(sorted_keys_plags[i][1], path, name_depth)) -- $(get_summary(sorted_keys_plags[i][2], path, name_depth)) --> $(round(sorted_values_plags[i];digits=4))")
+    if length(plags) > 0
+        sorted_keys_plags, sorted_values_plags = get_sorted_list_from_dict(plags)
+        for i in 1:length(sorted_keys_plags)
+            if sorted_keys_plags[i] ∉ keys(no_comments)
+                push!(out_array,"[] $(get_summary(sorted_keys_plags[i][1], path, name_depth)) -- $(get_summary(sorted_keys_plags[i][2], path, name_depth)) --> $(round(sorted_values_plags[i];digits=4))")
+            end
         end
     end
-    if length(no_comments) > 0 && length(plags) > 0
+    if length(no_comments) > 0 || length(plags) > 0
         writedlm(joinpath(report_path,"$(report_name).txt"), out_array)
     end
     summarize(diffs, plags, threshold, report_name)
