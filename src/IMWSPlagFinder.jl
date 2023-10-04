@@ -119,6 +119,14 @@ function search_for_file(path, file_name)
     end
     if length(file_not_found) > 0
         writedlm(joinpath(report_path,"$(report_name).txt"), out_array)
+        println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        println("Bei zwei Personen habe ich die Datei $(file_name) nicht gefunden.")
+        println("Diese Personen sind in $(report_name).txt aufgelistet.")
+        println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    else
+        println("-------------------------------------------------------")
+        println("Ich habe die Datei $(file_name) bei allen gefunden.")
+        println("-------------------------------------------------------")
     end
     return file_not_found
 end
@@ -148,7 +156,7 @@ function summarize(diffs, plags, threshold, report_name)
         println("Ich habe $(n_plags) mögliche Plagiate gefunden!")
         println(" median = $(round(median_diff;digits=3)), q_99 = $(round(quantile_99_diff;digits=3))")
         println("Der Grenzwert der Levenshtein-Distanz ist $(threshold).")
-        println("Sie dir die Datein in $(report_name).txt genauer an!")
+        println("Sie dir die Dateien in $(report_name).txt genauer an!")
         println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     else
         println("-------------------------------------------------------")
