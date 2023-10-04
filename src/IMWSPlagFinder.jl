@@ -84,6 +84,32 @@ function generate_database(path; file_endings=[".m"], dc=[' ', '%'])
     return file_dict
 end
 
+"""
+    search_for_file(path, file_name)
+
+Creates a list of all subdirectories in `path` and searches for `file_name` in each of them.
+Returns a list of all subdirectories, which do not contain `file_name`.
+"""
+function search_for_file(path, file_name)
+    names = readdir(path)[isdir.(joinpath.(path,readdir(path)))]
+    database = generate_database(path)
+    file_found = AbstractString[]
+    file_not_found = AbstractString[]
+    for name in names
+        for k in keys(database)
+            if contains(k, name) && contains(k, file_name)
+                push!(file_found, name)
+            end
+        end
+    end
+    for name in names
+        if name ∉ file_found
+            push!(file_not_found, name)
+        end
+    end
+    return file_not_found
+end
+
 get_name(path, submissions_path, name_depth) = splitpath(path)[name_depth+length(splitpath(submissions_path))]
 
 get_file_name(path) = splitpath(path)[end]
