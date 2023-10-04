@@ -132,17 +132,18 @@ function summarize(diffs, plags, threshold, report_name)
     # Zusammenfassung ausgeben
     if n_plags > 0
         println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        println("I found $(n_plags) cases of possible plagiarism!")
+        println("Ich habe $(n_plags) mögliche Plagiate gefunden!")
         println(" median = $(round(median_diff;digits=3)), q_99 = $(round(quantile_99_diff;digits=3))")
-        println("The Levenshtein-threshold was set to $(threshold).")
-        println("Take a closer look at the submissions, listed in the file $(report_name).txt!")
+        println("Der Grenzwert der Levenshtein-Distanz ist $(threshold).")
+        println("Sie dir die Datein in $(report_name).txt genauer an!")
         println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     else
         println("-------------------------------------------------------")
-        println("I couldn't find any cases of plagiarism.")
-        println("I guess that's a good sign,")
-        println("but maybe you should change the threshold,")
-        println("just to be sure.")
+        println("Ich habe keine möglichen Plagiate gefunden.")
+        println("Ich denke, dass ist ein gutes Zeichen.")
+        println("Verringere aber zur Sicherheit den Grenzwert der Levenshtein-Distanz.")
+        println("Ein guter Anhaltspunkt sind Median und 99%-Quantil der Levenshtein-Distanzen.")
+        println(" median = $(round(median_diff;digits=3)), q_99 = $(round(quantile_99_diff;digits=3))")
         println("-------------------------------------------------------")
     end
 end
@@ -211,6 +212,7 @@ function compare_files(path, compare_from, compare_to, threshold; excluded=[], f
     writedlm(joinpath(report_path,"$(report_name).txt"), out_array)
     summarize(diffs, plags, threshold, report_name)
 end
+
 """
     compare_files(path, threshold; excluded=[], file_endings=[".m"], chars_to_delete=[' ', '%'], report_path = "./", report_name="report", name_depth=3,  min_comments=3, comment_char='%')
 
