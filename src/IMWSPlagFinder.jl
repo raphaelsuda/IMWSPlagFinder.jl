@@ -56,6 +56,11 @@ function func2string(f, dc)
     return s
 end
 
+function count_comments(file_path; comment_char='%', n_min=10)
+    data = readlines(file_path)
+    return count(contains.(data, comment_char) .&& length.(data) .>= n_min)
+end
+
 function read_files!(file_dict, path, file_endings, dc)
     files = readdir(path)
     for f in files
@@ -117,17 +122,22 @@ function summarize(diffs, plags, threshold, report_name)
 end
 
 """
-    compare_files(path, compare_from, compare_to, threshold; excluded=[], file_endings=[".m"], chars_to_delete=[' ', '%'], report_path = "./", report_name="report", name_depth=3)
+    compare_files(path, compare_from, compare_to, threshold; excluded=[], file_endings=[".m"], chars_to_delete=[' ', '%'], report_path = "./", report_name="report", name_depth=3, min_comments=3, comment_char='%')
 
 Searches for files with one of the file endings in `file_ending` within `path`, reads them, deletes newline characters and each character in `chars_to_delete`, and writes them to a dictionary.
 Each file, which contains each string in `compare_from` in their file path, is then compared to each file, which contains each string in `compare_to` in their file path, by calculating the Levenshtein distance. If the Levenshtein distance is greater than `threshold`, the files are considered to be plagiarized. The results are written to a file with ending `.txt` in `report_path` with the name `report_name`.
 """
-function compare_files(path, compare_from, compare_to, threshold; excluded=[], file_endings=[".m"], chars_to_delete=[' ', '%'], report_path = "./", report_name="report", name_depth=3)
+function compare_files(path, compare_from, compare_to, threshold; excluded=[], file_endings=[".m"], chars_to_delete=[' ', '%'], report_path = "./", report_name="report", name_depth=3, min_comments=3, comment_char='%')
     database = generate_database(path; file_endings=file_endings, dc=chars_to_delete)
     diffs = Dict{Tuple, Number}()
     plags = Dict{Tuple, Number}()
+    no_comments = Dict{AbstractString, Number}()
     @showprogress 0.1 "Comparing..." for k in keys(database)
         if contains_all_from_array(k, compare_from)
+            n_comments = count_comments(k; comment_char=comment_char)
+            if n_comments < min_comments
+                no_comments[k] = n_comments
+            end
             for k2 in keys(database)
                 if contains_one_from_array(k2, excluded)
                     continue
@@ -150,32 +160,48 @@ function compare_files(path, compare_from, compare_to, threshold; excluded=[], f
                         "Dabei wurden alle Dateien ignoriert, deren Pfad folgende Teile enthält: $(replace("$(excluded)", '"' => "'")).",
                         "",
                         "Es wurden nur Dateien berücksichtigt die folgende Dateiendungen haben: $(replace("$(file_endings)", '"' => "'")).",
-                        "Zusätzlich wurden foglende Zeichen beim Vergleich ignoriert: $(chars_to_delete).",
-                        "",
-                        "Der Grenzwert der Levenshtein-Distanz wurde mit $(threshold) gewählt.",
-                        "Die folgende Liste ist absteigend nach der Levenshtein-Distanz sortiert.",
-                        "Eine größere Levenshtein-Distanz bedeutet eine größere Ähnlichkeit der Dateien.",
+                        "Zusätzlich wurden folgende Zeichen beim Vergleich ignoriert: $(chars_to_delete).",
                         ""]
+    if length(no_comments) > 0
+        push!(out_array, ["## Kommentar-Check",
+                        "Folgende Abgaben enthalten weniger als $(min_comments) Kommentare:",
+                        ""])
+        for k in keys(no_comments)
+            push!(out_array,"[] $(get_name(k, path, name_depth)): $(get_file_name(k)) --> $(no_comments[k]) Kommentare")
+        end
+    end
+    push!(out_array, ["## Plagiate",
+                      "Der Grenzwert der Levenshtein-Distanz wurde mit $(threshold) gewählt.",
+                      "Die folgende Liste ist absteigend nach der Levenshtein-Distanz sortiert.",
+                      "Eine größere Levenshtein-Distanz bedeutet eine größere Ähnlichkeit der Dateien.",
+                      ""])
     sorted_keys_plags, sorted_values_plags = get_sorted_list_from_dict(plags)
     for i in 1:length(sorted_keys_plags)
-        push!(out_array,"[] $(get_summary(sorted_keys_plags[i][1], path, name_depth)) -- $(get_summary(sorted_keys_plags[i][2], path, name_depth)) --> $(round(sorted_values_plags[i];digits=4))")
+        if sorted_keys_plags[i] ∉ keys(no_comments)
+            push!(out_array,"[] $(get_summary(sorted_keys_plags[i][1], path, name_depth)) -- $(get_summary(sorted_keys_plags[i][2], path, name_depth)) --> $(round(sorted_values_plags[i];digits=4))")
+        end
     end
     writedlm(joinpath(report_path,"$(report_name).txt"), out_array)
     summarize(diffs, plags, threshold, report_name)
 end
 """
-    compare_files(path, threshold; excluded=[], file_endings=[".m"], chars_to_delete=[' ', '%'], report_path = "./", report_name="report", name_depth=3)
+    compare_files(path, threshold; excluded=[], file_endings=[".m"], chars_to_delete=[' ', '%'], report_path = "./", report_name="report", name_depth=3,  min_comments=3, comment_char='%')
 
 Searches for files with one of the file endings in `file_ending` within `path`, reads them, deletes newline characters and each character in `chars_to_delete`, and writes them to a dictionary.
 Each file is then compared to each other file by calculating the Levenshtein distance.
 If the Levenshtein distance is greater than `threshold`, the files are considered to be plagiarized.
 The results are written to a file with ending `.txt` in `report_path` with the name `report_name`.
 """
-function compare_files(path, threshold; excluded=[], file_endings=[".m"], chars_to_delete=[' ', '%'], report_path = "./", report_name="report")
+function compare_files(path, threshold; excluded=[], file_endings=[".m"], chars_to_delete=[' ', '%'], report_path = "./", report_name="report",  min_comments=3, comment_char='%')
     database = generate_database(path; file_endings=file_endings, dc=chars_to_delete)
     diffs = Dict{Tuple, Number}()
     plags = Dict{Tuple, Number}()
+    no_comments = Dict{AbstractString, Number}()
     @showprogress 0.1 "Comparing..." for k in keys(database)
+        n_comments = count_comments(k; comment_char=comment_char)
+        if n_comments < min_comments
+            no_comments[k] = n_comments
+        end
         for k2 in keys(database)
             if contains_one_from_array(k2, excluded)
                 continue
@@ -197,15 +223,26 @@ function compare_files(path, threshold; excluded=[], file_endings=[".m"], chars_
                         "Dabei wurden alle Dateien ignoriert, deren Pfad folgende Teile enthält: $(replace("$(excluded)", '"' => "'")).",
                         "",
                         "Es wurden nur Dateien berücksichtigt die folgende Dateiendungen haben: $(replace("$(file_endings)", '"' => "'")).",
-                        "Zusätzlich wurden foglende Zeichen beim Vergleich ignoriert: $(chars_to_delete).",
-                        "",
-                        "Der Grenzwert der Levenshtein-Distanz wurde mit $(threshold) gewählt.",
-                        "Die folgende Liste ist absteigend nach der Levenshtein-Distanz sortiert.",
-                        "Eine größere Levenshtein-Distanz bedeutet eine größere Ähnlichkeit der Dateien.",
+                        "Zusätzlich wurden folgende Zeichen beim Vergleich ignoriert: $(chars_to_delete).",
                         ""]
+    if length(no_comments) > 0
+        push!(out_array, ["## Kommentar-Check",
+                        "Folgende Abgaben enthalten weniger als $(min_comments) Kommentare:",
+                        ""])
+        for k in keys(no_comments)
+            push!(out_array,"[] $(get_name(k, path, name_depth)): $(get_file_name(k)) --> $(no_comments[k]) Kommentare")
+        end
+    end
+    push!(out_array, ["## Plagiate",
+                      "Der Grenzwert der Levenshtein-Distanz wurde mit $(threshold) gewählt.",
+                      "Die folgende Liste ist absteigend nach der Levenshtein-Distanz sortiert.",
+                      "Eine größere Levenshtein-Distanz bedeutet eine größere Ähnlichkeit der Dateien.",
+                      ""])
     sorted_keys_plags, sorted_values_plags = get_sorted_list_from_dict(plags)
     for i in 1:length(sorted_keys_plags)
-        push!(out_array,"[] $(get_summary(sorted_keys_plags[i][1], path, name_depth)) -- $(get_summary(sorted_keys_plags[i][2], path, name_depth)) --> $(round(sorted_values_plags[i];digits=4))")
+        if sorted_keys_plags[i] ∉ keys(no_comments)
+            push!(out_array,"[] $(get_summary(sorted_keys_plags[i][1], path, name_depth)) -- $(get_summary(sorted_keys_plags[i][2], path, name_depth)) --> $(round(sorted_values_plags[i];digits=4))")
+        end
     end
     writedlm(joinpath(report_path,"$(report_name).txt"), out_array)
     summarize(diffs, plags, threshold, report_name)
