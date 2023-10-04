@@ -85,12 +85,12 @@ function generate_database(path; file_endings=[".m"], dc=[' ', '%'])
 end
 
 """
-    search_for_file(path, file_name)
+    search_for_file(path, file_name; report_path = "./", report_name="missing_file_report")
 
 Creates a list of all subdirectories in `path` and searches for `file_name` in each of them.
 Returns a list of all subdirectories, which do not contain `file_name`.
 """
-function search_for_file(path, file_name)
+function search_for_file(path, file_name, report_path = "./", report_name="missing_file_report")
     names = readdir(path)[isdir.(joinpath.(path,readdir(path)))]
     database = generate_database(path)
     file_found = AbstractString[]
@@ -117,6 +117,7 @@ function search_for_file(path, file_name)
     for name in names 
         push!(out_array,"[] $(name)")
     end
+    writedlm(joinpath(report_path,"$(report_name).txt"), out_array)
     if length(file_not_found) > 0
         writedlm(joinpath(report_path,"$(report_name).txt"), out_array)
         println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
@@ -128,7 +129,6 @@ function search_for_file(path, file_name)
         println("Ich habe die Datei $(file_name) bei allen gefunden.")
         println("-------------------------------------------------------")
     end
-    return file_not_found
 end
 
 get_name(path, submissions_path, name_depth) = splitpath(path)[name_depth+length(splitpath(submissions_path))]
