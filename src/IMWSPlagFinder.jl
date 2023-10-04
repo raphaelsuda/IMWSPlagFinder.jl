@@ -107,6 +107,19 @@ function search_for_file(path, file_name)
             push!(file_not_found, name)
         end
     end
+    out_array = String["# Fehlende Dateien",
+                        "$(today())",
+                        "",
+                        "Alle Ordner in $(path) wurden nach einer Datei $(file_name) durchsucht."]
+    append!(out_array, ["",
+                        "In folgenden Ordnern wurde die Datei nicht gefunden:",
+                        ""])
+    for name in names 
+        push!(out_array,"[] $(name)")
+    end
+    if length(file_not_found) > 0
+        writedlm(joinpath(report_path,"$(report_name).txt"), out_array)
+    end
     return file_not_found
 end
 
