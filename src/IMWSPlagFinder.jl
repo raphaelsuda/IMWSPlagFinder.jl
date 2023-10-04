@@ -163,14 +163,14 @@ function compare_files(path, compare_from, compare_to, threshold; excluded=[], f
                         "Zusätzlich wurden folgende Zeichen beim Vergleich ignoriert: $(chars_to_delete).",
                         ""]
     if length(no_comments) > 0
-        push!(out_array, ["## Kommentar-Check",
+        append!(out_array, ["## Kommentar-Check",
                         "Folgende Abgaben enthalten weniger als $(min_comments) Kommentare:",
                         ""])
         for k in keys(no_comments)
             push!(out_array,"[] $(get_name(k, path, name_depth)): $(get_file_name(k)) --> $(no_comments[k]) Kommentare")
         end
     end
-    push!(out_array, ["## Plagiate",
+    append!(out_array, ["## Plagiate",
                       "Der Grenzwert der Levenshtein-Distanz wurde mit $(threshold) gewählt.",
                       "Die folgende Liste ist absteigend nach der Levenshtein-Distanz sortiert.",
                       "Eine größere Levenshtein-Distanz bedeutet eine größere Ähnlichkeit der Dateien.",
@@ -226,14 +226,14 @@ function compare_files(path, threshold; excluded=[], file_endings=[".m"], chars_
                         "Zusätzlich wurden folgende Zeichen beim Vergleich ignoriert: $(chars_to_delete).",
                         ""]
     if length(no_comments) > 0
-        push!(out_array, ["## Kommentar-Check",
+        append!(out_array, ["## Kommentar-Check",
                         "Folgende Abgaben enthalten weniger als $(min_comments) Kommentare:",
                         ""])
         for k in keys(no_comments)
             push!(out_array,"[] $(get_name(k, path, name_depth)): $(get_file_name(k)) --> $(no_comments[k]) Kommentare")
         end
     end
-    push!(out_array, ["## Plagiate",
+    append!(out_array, ["## Plagiate",
                       "Der Grenzwert der Levenshtein-Distanz wurde mit $(threshold) gewählt.",
                       "Die folgende Liste ist absteigend nach der Levenshtein-Distanz sortiert.",
                       "Eine größere Levenshtein-Distanz bedeutet eine größere Ähnlichkeit der Dateien.",
