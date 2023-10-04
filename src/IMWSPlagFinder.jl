@@ -276,7 +276,9 @@ function compare_files(path, threshold; excluded=[], file_endings=[".m"], chars_
             push!(out_array,"[] $(get_summary(sorted_keys_plags[i][1], path, name_depth)) -- $(get_summary(sorted_keys_plags[i][2], path, name_depth)) --> $(round(sorted_values_plags[i];digits=4))")
         end
     end
-    writedlm(joinpath(report_path,"$(report_name).txt"), out_array)
+    if length(no_comments) > 0 && length(plags) > 0
+        writedlm(joinpath(report_path,"$(report_name).txt"), out_array)
+    end
     summarize(diffs, plags, threshold, report_name)
 end
 end
