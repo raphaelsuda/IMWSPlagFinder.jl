@@ -34,6 +34,28 @@ Both methods also take the following additional keyword arguments (values after 
 - `report_name = "report"`: Name of the report.
 - `name_depth = 3`: Level of the name folder relative to the given `path`. If the file path is `"submissions/WS23/HUE1/name/func.m"` and the input for `path` is `"submissions"`, `name_depth` would be `3`.
 
+Another helpful function is `search_for_file(path, file_name)`.
+This function reads each directory in `path` and searches in each directory for a file named `file_name`.
+Thereby, it also searches all subdirectories of each directory.
+The function writes a report containing all the directories in which the file was not found.
+Thus, it is particulary helpful, when a `path` with the following folder structure is searched.
+
+```
+path
+  |_ Name 1
+     |_ File 1
+     |_ File 2
+     |_ File 3
+  |_ Name 2
+     |_ File 1
+     |_ File 2
+     |_ File 3
+```
+
+Additionally, the following two keyword arguments define the path and name of the report:
+- `report_path = "./"`: Defines the path of the report.
+- `report_name = "missing_files_report`: Defines the name of the report.
+
 ## Original intentions
 This script was originally developed for analyzing the submissions in the lecture "VU Finite Elemente Methoden".
 Within this lecture, students have to submit MATLAB functions and scripts in four subsequent exercises.
