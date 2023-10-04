@@ -114,10 +114,12 @@ function search_for_file(path, file_name; report_path = "./", report_name="missi
     append!(out_array, ["",
                         "In folgenden Ordnern wurde die Datei nicht gefunden:",
                         ""])
-    for name in names 
+    for name in file_not_found
         push!(out_array,"[] $(name)")
     end
-    writedlm(joinpath(report_path,"$(report_name).txt"), out_array)
+    if length(file_not_found) > 0
+        writedlm(joinpath(report_path,"$(report_name).txt"), out_array)
+    end
     if length(file_not_found) > 0
         writedlm(joinpath(report_path,"$(report_name).txt"), out_array)
         println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
